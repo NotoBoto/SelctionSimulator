@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEditor.Build.Content;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -11,41 +10,62 @@ public class EntityController : MonoBehaviour
     public EntityModel EntityModel;
     private EntityView _entityView;
     
-    private Renderer _entityRenderer;
-    private NavMeshAgent _entityAgent;
+    private GameController _gameController;
+
+    [HideInInspector]
+    public Renderer _entityRenderer;
+    [HideInInspector]
+    public NavMeshAgent _entityAgent;
 
     private void Awake()
     {
         EntityModel = new EntityModel();
         _entityView = GetComponent<EntityView>();
 
+        _gameController = FindAnyObjectByType<GameController>();
+
         _entityRenderer = GetComponent<Renderer>();
         _entityAgent = GetComponent<NavMeshAgent>();
 
-        EntityModel.Speed = 1.0f;
-        EntityModel.Size = 1.0f;
-        EntityModel.MaxHP = 5.0f;
-        EntityModel.HP = EntityModel.MaxHP;
-        EntityModel.Damage = 1.0f;
-        EntityModel.Color = Color.white;
+        this.gameObject.SetActive(false);
+    }
+
+    private void OnEnable()
+    {
+        Invoke("Change—haracteristics", 0.01f);
+
+
         EntityModel.FoodCount = 0;
         EntityModel.HomePosition = transform.position;
+        EntityModel.IsGoingHome = false;
+        EntityModel.IsGotHome = false;
     }
 
     private void Update()
     {
-        if (EntityModel.FoodCount == 0)
+        if (_gameController.IsGameStarted && !_gameController.IsGamePaused && _gameController.IsDayRunning)
         {
-            FindNearestTarget();
+            _entityAgent.isStopped = false;
+            if (EntityModel.FoodCount < 2 && !EntityModel.IsGoingHome)
+            {
+                FindNearestTarget();
+            }
+            else
+            {
+                _entityAgent.SetDestination(EntityModel.HomePosition);
+                if (_entityAgent.remainingDistance <= 0.25f)
+                {
+                    EntityModel.IsGotHome = true;
+                    gameObject.SetActive(false);
+                    _gameController.NextDay();
+                }
+            }
         }
         else
         {
-            _entityAgent.SetDestination(EntityModel.HomePosition);
-            if (_entityAgent.remainingDistance <= 0.25f)
-            {
-                gameObject.SetActive(false);
-            }
+            _entityAgent.isStopped = true;
         }
+
     }
 
     private void OnTriggerEnter(Collider other)
@@ -75,14 +95,14 @@ public class EntityController : MonoBehaviour
             Transform nearestTarget = null;
             float closestDistance = Mathf.Infinity;
 
-            foreach (GameObject _target in targets)
+            foreach (GameObject target in targets)
             {
-                float distance = Vector3.Distance(transform.position, _target.transform.position);
+                float distance = Vector3.Distance(transform.position, target.transform.position);
 
                 if (distance < closestDistance)
                 {
                     closestDistance = distance;
-                    nearestTarget = _target.transform;
+                    nearestTarget = target.transform;
                 }
             }
 
@@ -93,7 +113,16 @@ public class EntityController : MonoBehaviour
         }
         else
         {
-            _entityAgent.isStopped = true;
+            EntityModel.IsGoingHome = true;
         }
+    }
+
+    public void Change—haracteristics()
+    {
+        _entityAgent.speed = EntityModel.Speed;
+        _entityAgent.angularSpeed = EntityModel.Speed * (120 / _gameController.StartSpeed);
+        transform.localScale = new Vector3(EntityModel.Size, 1f, EntityModel.Size);
+        EntityModel.HP = EntityModel.MaxHP;
+        _entityRenderer.material.color = EntityModel.Color;
     }
 }

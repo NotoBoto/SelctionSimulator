@@ -59,4 +59,18 @@ public class EntityModel
         get { return _homePosition; }
         set { _homePosition = value; }
     }
+
+    private bool _isGoingHome;
+    public bool IsGoingHome
+    {
+        get { return _isGoingHome; }
+        set { _isGoingHome = value;}
+    }
+
+    private bool _isGotHome;
+    public bool IsGotHome
+    {
+        get { return _isGotHome; }
+        set { _isGotHome = value;}
+    }
 }
