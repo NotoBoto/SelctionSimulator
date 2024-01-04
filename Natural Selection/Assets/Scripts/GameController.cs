@@ -138,6 +138,6 @@ public class GameController : MonoBehaviour
             entity.EntityModel.Size + Random.Range(-0.25f, 0.5f),
             entity.EntityModel.MaxHP + Random.Range(-1f, 2f),
             entity.EntityModel.Damage + Random.Range(-0.5f, 1f),
-            new Color(Random.value, Random.value, Random.value));
+            new Color(entity.EntityModel.Damage / 50, entity.EntityModel.MaxHP / 100, (entity.EntityModel.Speed - 8) / 100));
     }
 }

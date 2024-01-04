@@ -68,21 +68,25 @@ public class EntityController : MonoBehaviour
 
     }
 
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            other.gameObject.GetComponent<EntityController>().EntityModel.HP -= EntityModel.Damage * Time.deltaTime * 2;
+        }
+
+        if (EntityModel.HP <= 0)
+        {
+            Destroy(this.gameObject);
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Food"))
         {
             Destroy(other.gameObject);
             EntityModel.FoodCount++;
-        }
-        else if (other.CompareTag("Player"))
-        {
-            other.gameObject.GetComponent<EntityController>().EntityModel.HP -= EntityModel.Damage;
-        }
-
-        if(EntityModel.HP <= 0) 
-        {
-            Destroy(this.gameObject);
         }
     }
 
