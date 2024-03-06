@@ -134,10 +134,10 @@ public class GameController : MonoBehaviour
         GameObject newEntity = Instantiate(_entityPrefab, position, Quaternion.identity);
         newEntity.transform.parent = _entityParent;
         Set—haracteristics(newEntity.GetComponent<EntityController>(),
-            entity.EntityModel.Speed + Random.Range(-0.5f, 1f),
-            entity.EntityModel.Size + Random.Range(-0.25f, 0.5f),
-            entity.EntityModel.MaxHP + Random.Range(-1f, 2f),
-            entity.EntityModel.Damage + Random.Range(-0.5f, 1f),
+            entity.EntityModel.Speed + Random.Range(-1f, 1f),
+            entity.EntityModel.Size + Random.Range(-0.5f, 0.5f),
+            entity.EntityModel.MaxHP + Random.Range(-2f, 2f),
+            entity.EntityModel.Damage + Random.Range(-1f, 1f),
             new Color(entity.EntityModel.Damage / 50, entity.EntityModel.MaxHP / 100, (entity.EntityModel.Speed - 8) / 100));
     }
 }
